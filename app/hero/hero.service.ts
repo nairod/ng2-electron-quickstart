@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import * as Datastore from 'nedb';
 
 export class Hero {
   constructor(public id: number, public name: string) { }
@@ -13,20 +14,49 @@ const HEROES: Hero[] = [
   new Hero(16, 'RubberMan')
 ];
 
-const FETCH_LATENCY = 500;
+
 
 @Injectable()
 export class HeroService {
+  private heroDB: Datastore;
 
-  getHeroes() {
-    return new Promise<Hero[]>(resolve => {
-      setTimeout(() => { resolve(HEROES); }, FETCH_LATENCY);
+  constructor() {
+    this.heroDB = new Datastore({
+      filename: './heroes.json', // provide a path to the database file 
+      autoload: true
     });
+
+    for (let hero of HEROES) {
+      this.heroDB.insert(hero, function (err: any, doc: any) {
+        console.log('Inserted', doc.name, 'with ID', doc._id);
+      });
+    }
   }
 
-  getHero(id: number | string) {
-    return this.getHeroes()
-      .then(heroes => heroes.find(hero => hero.id === +id));
+
+  getHeroes(): Promise<Array<Hero>> {
+    return new Promise((resolve, reject) => {
+      return this.heroDB.find({}, ((err: Error, inventarliste: Array<Hero>) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(inventarliste);
+        }
+      }));
+    })
+  }
+
+  public getHero(id: number | string): Promise<Hero> {
+    return new Promise((resolve, reject) => {
+      return this.heroDB.findOne({ id: id }, ((err: Error, hero: Hero) => {
+        if (err) {
+          reject(err);
+        } else {
+          console.log('Got', hero.name, 'with ID', hero.id);
+          resolve(hero);
+        }
+      }));
+    });
   }
 
 }
