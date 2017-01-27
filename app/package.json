@@ -1,0 +1,8 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "ng2-electron-quickstart",
+  "main": "main.ts",
+  "author": "",
+  "license": "ISC"
+}

@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as Datastore from 'nedb';
+let remote = require('electron').remote;
+
 
 export class Hero {
   constructor(public id: number, public name: string) { }
@@ -18,14 +20,10 @@ const HEROES: Hero[] = [
 
 @Injectable()
 export class HeroService {
-  private heroDB: Datastore;
+   private heroDB: Datastore;
 
   constructor() {
-    this.heroDB = new Datastore({
-      filename: './heroes.json', // provide a path to the database file 
-      autoload: true
-    });
-
+    this.heroDB = remote.getGlobal('datastore');
     for (let hero of HEROES) {
       this.heroDB.insert(hero, function (err: any, doc: any) {
         console.log('Inserted', doc.name, 'with ID', doc._id);

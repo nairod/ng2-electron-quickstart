@@ -4,6 +4,11 @@ var app = electron.app;
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 var mainWindow;
+
+var Datastore = require('nedb')
+  , db = new Datastore({ filename: './datastore/data.json', autoload: true });
+global.datastore =db;
+
 function createWindow() {
     mainWindow = new electron.BrowserWindow({ width: 800, height: 600 });
     // We load this over http when running locally to take advantage of BrowserSync. Because the lite-server
